@@ -91,3 +91,28 @@ test('recovers Spotify identity from preserved raw payloads when normalized affi
   assert.equal(result.market, 'US');
   assert.equal(result.diagnostics.sourceProviderHint, 'spotify');
 });
+
+test('normalizes Spotify track identity from URL and URI forms consistently', () => {
+  const result = resolveSpotifyQueryIdentity({
+    song: {
+      title: 'Without You',
+      artist: 'Harry Nilsson',
+    },
+    metadataAffinity: {
+      providerFamily: 'spotify',
+      providerIds: {
+        spotifyTrackUrl: 'https://open.spotify.com/track/6jX8HLc8uwNFs9R6M9t0nE?si=test',
+      },
+    },
+    raw: {
+      spotify: {
+        uri: 'spotify:track:4uLU6hMCjMI75M1A2tKUQC',
+      },
+    },
+  });
+
+  assert.equal(result.spotifyTrackId, '6jX8HLc8uwNFs9R6M9t0nE');
+  assert.equal(result.spotifyUri, 'spotify:track:6jX8HLc8uwNFs9R6M9t0nE');
+  assert.equal(result.spotifyTrackUrl, 'https://open.spotify.com/track/6jX8HLc8uwNFs9R6M9t0nE');
+  assert.equal(result.diagnostics.rawSpotifyUri, 'spotify:track:4uLU6hMCjMI75M1A2tKUQC');
+});

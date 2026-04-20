@@ -179,3 +179,77 @@ test('rejects longer Spotify search candidates that are not an exact normalized 
   assert.equal(result.providerReason, 'duration_not_found');
   assert.equal(result.providerDiagnostics.searchRejected, 'no-exact-match');
 });
+
+test('never lets search run when a direct Spotify track id is already available', async () => {
+  const result = await querySpotifyDuration({
+    identity: {
+      spotifyTrackId: '6jX8HLc8uwNFs9R6M9t0nE',
+      title: 'Without You',
+      artist: 'Harry Nilsson',
+    },
+    settings: {
+      client_id: 'spotify-client-id',
+      client_secret: 'spotify-client-secret',
+    },
+    sdkFactory: () => ({
+      tracks: {
+        get: async () => ({
+          id: '6jX8HLc8uwNFs9R6M9t0nE',
+          duration_ms: 201000,
+        }),
+      },
+      search: async () => {
+        throw new Error('search should not run when direct track identity exists');
+      },
+    }),
+  });
+
+  assert.equal(result.durationMs, 201000);
+  assert.equal(result.providerDiagnostics.winnerLane, 'track-id');
+});
+
+test('returns identity_not_supported when search fallback is disabled and no direct track identity exists', async () => {
+  const result = await querySpotifyDuration({
+    identity: {
+      title: 'Without You',
+      artist: 'Harry Nilsson',
+    },
+    settings: {
+      client_id: 'spotify-client-id',
+      client_secret: 'spotify-client-secret',
+      allow_search_fallback: false,
+    },
+    sdkFactory: () => {
+      throw new Error('sdk should not be created when search is disabled and no direct identity exists');
+    },
+  });
+
+  assert.equal(result.durationMs, undefined);
+  assert.equal(result.providerReason, 'identity_not_supported');
+  assert.equal(result.providerDiagnostics.searchSkipped, 'disabled-by-setting');
+});
+
+test('surfaces provider_error when direct Spotify lookup throws', async () => {
+  const result = await querySpotifyDuration({
+    identity: {
+      spotifyTrackId: '6jX8HLc8uwNFs9R6M9t0nE',
+      title: 'Without You',
+      artist: 'Harry Nilsson',
+    },
+    settings: {
+      client_id: 'spotify-client-id',
+      client_secret: 'spotify-client-secret',
+    },
+    sdkFactory: () => ({
+      tracks: {
+        get: async () => {
+          throw new Error('401 unauthorized');
+        },
+      },
+    }),
+  });
+
+  assert.equal(result.durationMs, undefined);
+  assert.equal(result.providerReason, 'provider_error');
+  assert.match(result.providerDiagnostics.trackLookupError, /401 unauthorized/i);
+});
