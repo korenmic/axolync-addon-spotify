@@ -28,6 +28,16 @@ function normalizeDurationMs(value) {
     : null;
 }
 
+function normalizeComparisonText(value) {
+  return String(value ?? '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^\p{Letter}\p{Number}]+/gu, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
 function normalizeMarket(value, fallback = 'US') {
   const normalized = trimString(value);
   if (!normalized) {
@@ -93,6 +103,13 @@ function normalizeTrackRecord(track) {
     id: trimString(track.id),
     uri: trimString(track.uri),
     url: trimString(track?.external_urls?.spotify),
+    title: trimString(track.name),
+    artist: Array.isArray(track.artists)
+      ? track.artists
+        .map((artist) => trimString(artist?.name))
+        .filter(Boolean)
+        .join(', ')
+      : null,
     isrc: trimString(track?.external_ids?.isrc)?.toUpperCase() ?? null,
     durationMs,
   };
@@ -101,6 +118,41 @@ function normalizeTrackRecord(track) {
 async function getTrackById(sdk, identity, market) {
   const track = await sdk.tracks.get(identity.spotifyTrackId, market);
   return normalizeTrackRecord(track);
+}
+
+async function searchTracks(sdk, identity, market) {
+  const query = `track:"${identity.title}" artist:"${identity.artist}"`;
+  const response = await sdk.search(query, ['track'], market, 10);
+  const items = Array.isArray(response?.tracks?.items) ? response.tracks.items : [];
+  return items.map(normalizeTrackRecord).filter(Boolean);
+}
+
+function isStrictIdentityMatch(track, identity) {
+  if (!track?.title || !track?.artist || !identity?.title || !identity?.artist) {
+    return false;
+  }
+  return normalizeComparisonText(track.title) === normalizeComparisonText(identity.title)
+    && normalizeComparisonText(track.artist) === normalizeComparisonText(identity.artist);
+}
+
+function pickBestSearchTrack(candidates, identity) {
+  const exactMatches = candidates.filter((candidate) => isStrictIdentityMatch(candidate, identity));
+  if (exactMatches.length === 0) {
+    return null;
+  }
+  if (identity?.isrc) {
+    const isrcMatch = exactMatches.find((candidate) => candidate.isrc === identity.isrc);
+    if (isrcMatch) {
+      return {
+        winner: isrcMatch,
+        promotedByIsrc: true,
+      };
+    }
+  }
+  return {
+    winner: exactMatches[0],
+    promotedByIsrc: false,
+  };
 }
 
 export async function querySpotifyDuration({
@@ -116,8 +168,33 @@ export async function querySpotifyDuration({
   }
 
   if (!identity?.spotifyTrackId) {
-    providerDiagnostics.attemptedLanes.push('none');
-    return failureResult('identity_not_supported', providerDiagnostics);
+    if (!providerDiagnostics.allowSearchFallback || !identity?.title || !identity?.artist) {
+      providerDiagnostics.attemptedLanes.push('none');
+      providerDiagnostics.searchSkipped = !providerDiagnostics.allowSearchFallback ? 'disabled-by-setting' : 'missing-identity';
+      return failureResult('identity_not_supported', providerDiagnostics);
+    }
+
+    const market = normalizeMarket(identity?.market ?? settings?.default_market, providerDiagnostics.defaultMarket);
+    providerDiagnostics.effectiveMarket = market;
+    const sdk = sdkFactory(settings);
+    providerDiagnostics.attemptedLanes.push('search');
+
+    try {
+      const searchResults = await searchTracks(sdk, identity, market);
+      providerDiagnostics.searchResultCount = searchResults.length;
+      const ranked = pickBestSearchTrack(searchResults, identity);
+      if (!ranked) {
+        providerDiagnostics.searchRejected = 'no-exact-match';
+        return failureResult('duration_not_found', providerDiagnostics);
+      }
+      providerDiagnostics.winnerLane = 'search';
+      providerDiagnostics.winnerTrackId = ranked.winner.id ?? null;
+      providerDiagnostics.searchWinnerPromotedByIsrc = ranked.promotedByIsrc;
+      return successResult(ranked.winner.durationMs, providerDiagnostics);
+    } catch (error) {
+      providerDiagnostics.searchError = trimString(error?.message) ?? 'unknown_error';
+      return failureResult('provider_error', providerDiagnostics);
+    }
   }
 
   const market = normalizeMarket(identity?.market ?? settings?.default_market, providerDiagnostics.defaultMarket);
