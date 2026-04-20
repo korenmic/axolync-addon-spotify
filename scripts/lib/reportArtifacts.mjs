@@ -13,12 +13,12 @@ export function buildAdapterInventory() {
     adapters: addon.adapters.map((adapter) => ({
       id: adapter.adapterId,
       label: adapter.label,
-      runtimeCodeState: 'placeholder',
-      shippableInRelease: false,
+      runtimeCodeState: 'local-js',
+      shippableInRelease: true,
       shippableInDebug: true,
       hiddenInUi: false,
       defaultEnabled: true,
-      notes: 'Stage 1 Spotify-backed SongMetadata adapter scaffold pending direct track lookup and bounded search implementation.',
+      notes: 'Stage 1 Spotify-backed SongMetadata adapter using the official TypeScript SDK for direct track lookup with strict bounded search fallback.',
     })),
   };
 }

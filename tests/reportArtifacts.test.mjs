@@ -11,6 +11,6 @@ test('tracked report artifacts describe one shippable Stage 1 SongMetadata addon
   assert.equal(manifest.addon.adapters.length, 1);
   assert.deepEqual(manifest.addon.adapters[0].query_methods.songmetadata, ['query_song_metadata']);
   assert.equal(inventory.pluginId, 'axolync-addon-spotify');
-  assert.equal(inventory.adapters[0].runtimeCodeState, 'placeholder');
-  assert.equal(inventory.adapters[0].shippableInRelease, false);
+  assert.equal(inventory.adapters[0].runtimeCodeState, 'local-js');
+  assert.equal(inventory.adapters[0].shippableInRelease, true);
 });

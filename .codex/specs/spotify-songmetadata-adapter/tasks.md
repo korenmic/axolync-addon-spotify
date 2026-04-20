@@ -3,4 +3,4 @@
 - [x] Wrap the official Spotify TypeScript SDK with addon-owned client-credentials auth and direct track lookup support.
 - [x] Implement conservative search fallback, lane ranking, diagnostics, and additive `{ durationMs }` output.
 - [x] Add regression coverage for track-id normalization, strict search matching, auth failures, and query behavior.
-- [ ] Validate packaging, refresh tracked report artifacts, and prove the packaged Stage 1 adapter can participate in browser SongMetadata queries.
+- [x] Validate packaging, refresh tracked report artifacts, and prove the packaged Stage 1 adapter can participate in browser SongMetadata queries.

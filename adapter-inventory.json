@@ -4,12 +4,12 @@
     {
       "id": "spotify",
       "label": "Spotify SongMetadata",
-      "runtimeCodeState": "placeholder",
-      "shippableInRelease": false,
+      "runtimeCodeState": "local-js",
+      "shippableInRelease": true,
       "shippableInDebug": true,
       "hiddenInUi": false,
       "defaultEnabled": true,
-      "notes": "Stage 1 Spotify-backed SongMetadata adapter scaffold pending direct track lookup and bounded search implementation."
+      "notes": "Stage 1 Spotify-backed SongMetadata adapter using the official TypeScript SDK for direct track lookup with strict bounded search fallback."
     }
   ]
 }
