@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spotify SongMetadata Open Question Resolutions</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #04140b;
+      --panel: rgba(10, 22, 17, 0.82);
+      --text: #e5f9ec;
+      --muted: #9ed8b5;
+      --accent: #1ed760;
+      --line: rgba(110, 231, 183, 0.2);
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #14532d, #04140b 58%);
+      color: var(--text);
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 56px;
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 2.2rem;
+    }
+    .intro {
+      color: var(--muted);
+      max-width: 820px;
+      margin-bottom: 28px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(10px);
+    }
+    .option {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 10px 0;
+      background: rgba(10, 22, 17, 0.7);
+    }
+    .option strong {
+      color: var(--accent);
+    }
+    .picked {
+      display: inline-block;
+      margin: 10px 0 18px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(30, 215, 96, 0.16);
+      border: 1px solid rgba(30, 215, 96, 0.38);
+      color: #bbf7d0;
+      font-weight: 700;
+    }
+    ul {
+      margin: 12px 0 0 20px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Spotify SongMetadata Open Question Resolutions</h1>
+    <p class="intro">These are the plausible Stage 1 answers that existed for the seed and the answer chosen for implementation.</p>
+
+    <section class="card">
+      <h2>Question 1</h2>
+      <p>Where should Spotify auth live in the first implementation: browser-local PKCE, shared host, or remote metadata broker?</p>
+      <div class="option"><strong>A</strong> Shared host owns Spotify auth from day one.</div>
+      <div class="option"><strong>B</strong> A remote metadata broker owns Spotify auth from day one.</div>
+      <div class="option"><strong>C</strong> Stage 1 keeps the addon local because browser SongMetadata execution is currently local-only, and the addon uses official SDK client-credentials auth from addon settings. This is a practical bridge, not the final long-term security model.</div>
+      <div class="picked">Chosen answer: C</div>
+      <ul>
+        <li>This is the only answer that fits the current SongMetadata execution model without inventing a new host first.</li>
+        <li>The adapter still wraps the official maintained SDK.</li>
+        <li>The compromise stays explicit so later extraction to a shared host is easy.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Question 2</h2>
+      <p>Which accepted-match Spotify affinity inputs should be considered strong enough to allow this adapter to run before broader fallback adapters?</p>
+      <div class="option"><strong>A</strong> Only a normalized Spotify track id is strong enough.</div>
+      <div class="option"><strong>B</strong> Accept Spotify track id first, and also accept Spotify URI or track URL when they can be normalized to the same track id. ISRC may promote search confirmation but does not replace direct Spotify identity.</div>
+      <div class="option"><strong>C</strong> Let artist/title alone be strong enough to treat the match as Spotify-backed.</div>
+      <div class="picked">Chosen answer: B</div>
+      <ul>
+        <li>Direct Spotify identity stays authoritative.</li>
+        <li>Real upstream raws can still work when they carry a URI or URL instead of a bare id.</li>
+        <li>Mere text similarity does not falsely claim Spotify affinity.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Question 3</h2>
+      <p>How conservative should Spotify search fallback be when no direct Spotify track id is available?</p>
+      <div class="option"><strong>A</strong> Any search hit with the right artist is good enough.</div>
+      <div class="option"><strong>B</strong> Require exact normalized artist match plus exact normalized title match after safe punctuation/whitespace folding, and let ISRC agreement promote the result when available. Otherwise emit no patch.</div>
+      <div class="option"><strong>C</strong> Let the longest plausible duration win among top search results.</div>
+      <div class="picked">Chosen answer: B</div>
+      <ul>
+        <li>The adapter stays bounded and provider-specific instead of becoming a fuzzy global matcher.</li>
+        <li>Longer but wrong tracks do not override the accepted song identity.</li>
+        <li>Legitimate search rescue still remains possible when strong Spotify ids are absent.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

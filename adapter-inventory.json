@@ -1,0 +1,15 @@
+{
+  "pluginId": "axolync-addon-spotify",
+  "adapters": [
+    {
+      "id": "spotify",
+      "label": "Spotify SongMetadata",
+      "runtimeCodeState": "none",
+      "shippableInRelease": false,
+      "shippableInDebug": false,
+      "hiddenInUi": false,
+      "requiresApiKey": true,
+      "notes": "Spotify-backed SongMetadata adapter candidate using the official spotify-web-api-ts-sdk wrapper for direct track lookup plus bounded search fallback to enrich canonical duration."
+    }
+  ]
+}

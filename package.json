@@ -1,0 +1,7 @@
+{
+  "name": "axolync-addon-spotify",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Seed-first Spotify-backed SongMetadata addon for Axolync.",
+  "license": "UNLICENSED"
+}

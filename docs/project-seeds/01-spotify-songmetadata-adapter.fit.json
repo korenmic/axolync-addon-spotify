@@ -1,0 +1,119 @@
+{
+  "adapterId": "spotify",
+  "controllerType": "SongMetadata",
+  "label": "Spotify SongMetadata",
+  "priority": "P1",
+  "researchStatus": "researched",
+  "summary": [
+    "A single Spotify SongMetadata addon is the honest first implementation shape because direct track-id lookup and bounded search fallback both belong to one provider-backed adapter, not to multiple fragmented Spotify rows.",
+    "The right backend is Spotify's official TypeScript SDK, which lets Axolync wrap a maintained provider client instead of hand-writing another Spotify Web API integration.",
+    "This is valuable but more operationally sensitive than iTunes because auth ownership and token lifecycle are part of the implementation cost."
+  ],
+  "candidateClass": {
+    "primary": "authenticated catalog metadata adapter",
+    "traits": [
+      "spotify-backed",
+      "track-id first",
+      "search fallback merged",
+      "wrapper-first implementation"
+    ]
+  },
+  "upstreamSnapshot": {
+    "sources": [
+      {
+        "label": "Spotify Get Track docs",
+        "url": "https://developer.spotify.com/documentation/web-api/reference/get-track"
+      },
+      {
+        "label": "Spotify Search docs",
+        "url": "https://developer.spotify.com/documentation/web-api/reference/search"
+      },
+      {
+        "label": "GitHub: Spotify Web API TS SDK",
+        "url": "https://github.com/spotify/spotify-web-api-ts-sdk"
+      }
+    ],
+    "signals": [
+      "Spotify documents `duration_ms` directly on the track object.",
+      "The official TypeScript SDK is maintained by Spotify and fits a wrapper-first addon implementation.",
+      "Search fallback is useful, but auth policy and result precision are the real reasons this is not as simple as iTunes."
+    ]
+  },
+  "licensing": {
+    "summary": {
+      "status": "service-gated",
+      "display": "Spotify service terms",
+      "notes": [
+        "The implementation should wrap Spotify's official OSS SDK, but the decisive dependency is still Spotify's hosted Web API and platform policy."
+      ]
+    },
+    "entries": [
+      {
+        "subject": "Spotify Get Track API",
+        "status": "service-gated",
+        "evidence": [
+          {
+            "label": "Spotify Get Track docs",
+            "url": "https://developer.spotify.com/documentation/web-api/reference/get-track"
+          }
+        ],
+        "notes": [
+          "The adapter depends on Spotify Web API access and Spotify platform rules."
+        ]
+      },
+      {
+        "subject": "spotify/spotify-web-api-ts-sdk",
+        "status": "permissive-oss",
+        "licenseExpression": "Apache-2.0",
+        "evidence": [
+          {
+            "label": "GitHub: Spotify Web API TS SDK",
+            "url": "https://github.com/spotify/spotify-web-api-ts-sdk"
+          }
+        ],
+        "notes": [
+          "This official TypeScript SDK is the intended wrapper backend for the addon."
+        ]
+      }
+    ]
+  },
+  "maintainability": {
+    "rating": "medium",
+    "notes": [
+      "Official API quality and official SDK support are strong.",
+      "Auth ownership and token lifecycle are the main complexity."
+    ]
+  },
+  "methods": [
+    { "id": "local-js-webview", "fit": "YELLOW", "notes": "Possible with browser-owned auth, but auth complexity is the limiting factor." },
+    { "id": "wasm-port-packaging", "fit": "BLACK", "notes": "There is no engine to port." },
+    { "id": "webview-native-bridge", "fit": "RED", "notes": "A native bridge is not the natural answer unless it already owns Spotify credentials." },
+    { "id": "browser-extension", "fit": "RED", "notes": "Feasible, but awkward compared with a proper host or browser-owned auth lane." },
+    { "id": "userscript", "fit": "BLACK", "notes": "Too brittle for an authenticated provider integration." },
+    { "id": "desktop-companion", "fit": "YELLOW", "notes": "Can own credentials, but adds a moving part when a shared host could do the same more cleanly." },
+    { "id": "shared-python-host", "fit": "YELLOW", "notes": "Works, but the strongest wrapper evidence is in TypeScript, not Python." },
+    { "id": "shared-node-host", "fit": "BRIGHT GREEN", "notes": "The cleanest way to wrap the official TypeScript SDK while centralizing token ownership and caching." },
+    { "id": "cli-wrapper", "fit": "DARK RED", "notes": "A CLI shell around Spotify adds indirection without improving the core integration." },
+    { "id": "ffi-native-host", "fit": "BLACK", "notes": "No native-library advantage exists here." },
+    { "id": "forced-conversion-local-js", "fit": "BLACK", "notes": "There is nothing to convert." },
+    { "id": "remote-shared-service", "fit": "DARK GREEN", "notes": "A remote metadata broker can also own auth, but is heavier than a shared node host." },
+    { "id": "cloud-microservice", "fit": "YELLOW", "notes": "Viable, but more operational cost than the first Spotify SongMetadata problem needs." },
+    { "id": "platform-sdk-direct", "fit": "BLACK", "notes": "This candidate is about the Spotify Web API, not a platform SDK." }
+  ],
+  "recommendation": {
+    "rankedMethodIds": [
+      "shared-node-host",
+      "remote-shared-service",
+      "local-js-webview"
+    ],
+    "notes": [
+      "Wrap the official TypeScript SDK and keep direct id lookup plus bounded search fallback in one adapter.",
+      "Leave scrape-style Spotify helper paths out of the first implementation seed."
+    ]
+  },
+  "openQuestions": [
+    "Where should Spotify auth live in the first implementation?",
+    "Which accepted-match Spotify affinity inputs should allow the adapter to run?",
+    "How conservative should Spotify search fallback be when no direct Spotify track id is available?"
+  ]
+}
