@@ -20,6 +20,7 @@ export class SpotifySongMetadataAdapter {
         spotifyUri: identity.spotifyUri,
         spotifyTrackUrl: identity.spotifyTrackUrl,
         isrc: identity.isrc,
+        market: identity.market,
         title: identity.title,
         artist: identity.artist,
         ...(result?.providerDiagnostics ?? {}),

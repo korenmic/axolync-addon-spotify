@@ -1,5 +1,5 @@
 - [x] Scaffold the repo into a Stage 1 SongMetadata addon baseline with tracked manifest and inventory artifacts.
-- [ ] Implement provider-local Spotify identity extraction from normalized affinity and preserved raw payloads.
+- [x] Implement provider-local Spotify identity extraction from normalized affinity and preserved raw payloads.
 - [ ] Wrap the official Spotify TypeScript SDK with addon-owned client-credentials auth and direct track lookup support.
 - [ ] Implement conservative search fallback, lane ranking, diagnostics, and additive `{ durationMs }` output.
 - [ ] Add regression coverage for track-id normalization, strict search matching, auth failures, and query behavior.
