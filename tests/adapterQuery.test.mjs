@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SpotifySongMetadataAdapter } from '../addon/adapters/SpotifySongMetadataAdapter/index.js';
 
-test('returns scaffold diagnostics while Spotify runtime lookup is still being implemented', async () => {
+test('returns auth_not_configured until addon-owned Spotify credentials are provided', async () => {
   const adapter = new SpotifySongMetadataAdapter();
   const result = await adapter.query_song_metadata({
     song: {
@@ -12,8 +12,8 @@ test('returns scaffold diagnostics while Spotify runtime lookup is still being i
   });
 
   assert.equal(result.durationMs, undefined);
-  assert.equal(result.providerReason, 'not_implemented');
-  assert.equal(result.providerDiagnostics.failureReason, 'not_implemented');
+  assert.equal(result.providerReason, 'auth_not_configured');
+  assert.equal(result.providerDiagnostics.failureReason, 'auth_not_configured');
   assert.equal(result.providerDiagnostics.title, 'Without You');
   assert.equal(result.providerDiagnostics.artist, 'Harry Nilsson');
 });
