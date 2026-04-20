@@ -2,6 +2,25 @@
   "name": "axolync-addon-spotify",
   "version": "0.1.0",
   "private": true,
-  "description": "Seed-first Spotify-backed SongMetadata addon for Axolync.",
-  "license": "UNLICENSED"
+  "type": "module",
+  "description": "Stage 1 Spotify-backed SongMetadata addon for Axolync.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@spotify/web-api-ts-sdk": "^1.2.0",
+    "fflate": "^0.8.2"
+  },
+  "scripts": {
+    "build": "node scripts/build-addon.mjs",
+    "generate:manifest": "node scripts/generate-manifest.mjs",
+    "generate:report-manifest": "node scripts/generate-manifest.mjs report/addon-manifest.spotify.json",
+    "package": "node scripts/package-addon.mjs",
+    "test": "node --test --test-concurrency=1",
+    "validate": "node scripts/validate-addon.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.10"
+  }
 }

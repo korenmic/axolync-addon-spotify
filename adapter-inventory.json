@@ -4,12 +4,12 @@
     {
       "id": "spotify",
       "label": "Spotify SongMetadata",
-      "runtimeCodeState": "none",
+      "runtimeCodeState": "placeholder",
       "shippableInRelease": false,
-      "shippableInDebug": false,
+      "shippableInDebug": true,
       "hiddenInUi": false,
-      "requiresApiKey": true,
-      "notes": "Spotify-backed SongMetadata adapter candidate using the official spotify-web-api-ts-sdk wrapper for direct track lookup plus bounded search fallback to enrich canonical duration."
+      "defaultEnabled": true,
+      "notes": "Stage 1 Spotify-backed SongMetadata adapter scaffold pending direct track lookup and bounded search implementation."
     }
   ]
 }

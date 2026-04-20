@@ -1,0 +1,73 @@
+{
+  "addon": {
+    "addon_id": "axolync-addon-spotify",
+    "name": "Axolync Spotify Addon",
+    "version": "0.1.0",
+    "contracts_version": "2.0.0",
+    "description": "Stage 1 Spotify-backed SongMetadata addon for canonical duration enrichment.",
+    "requirements": [],
+    "addon_settings": [],
+    "addon_actions": [],
+    "addon_runtime_data_surfaces": [],
+    "adapters": [
+      {
+        "adapter_id": "spotify",
+        "label": "Spotify SongMetadata",
+        "description": "Stage 1 Spotify-backed SongMetadata adapter for canonical duration enrichment.",
+        "host_mode": "local-js",
+        "supported_platforms": [
+          "web",
+          "android",
+          "desktop",
+          "ios"
+        ],
+        "required_permissions": [],
+        "required_host_capabilities": [],
+        "gating_settings": [],
+        "settings": [
+          {
+            "setting_id": "client_id",
+            "label": "Client ID",
+            "kind": "string",
+            "description": "Spotify client credentials app client id used for addon-owned token acquisition.",
+            "hidden_in_ui": false,
+            "default_value": ""
+          },
+          {
+            "setting_id": "client_secret",
+            "label": "Client Secret",
+            "kind": "string",
+            "description": "Spotify client credentials app client secret used for addon-owned token acquisition.",
+            "hidden_in_ui": false,
+            "default_value": ""
+          },
+          {
+            "setting_id": "default_market",
+            "label": "Default Market",
+            "kind": "string",
+            "description": "Fallback Spotify market used when the accepted match does not preserve one.",
+            "hidden_in_ui": false,
+            "default_value": "US"
+          },
+          {
+            "setting_id": "allow_search_fallback",
+            "label": "Allow Search Fallback",
+            "kind": "boolean",
+            "description": "Allow bounded Spotify artist/title search when direct Spotify track identity is unavailable or unusable.",
+            "hidden_in_ui": false,
+            "default_value": true
+          }
+        ],
+        "implementation": {
+          "module_path": "adapters/SpotifySongMetadataAdapter/index.js",
+          "export_name": "SpotifySongMetadataAdapter"
+        },
+        "query_methods": {
+          "songmetadata": [
+            "query_song_metadata"
+          ]
+        }
+      }
+    ]
+  }
+}
