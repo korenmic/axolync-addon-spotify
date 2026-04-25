@@ -4,6 +4,8 @@ import { pathToFileURL } from 'node:url';
 import * as esbuild from 'esbuild';
 import { zipSync } from 'fflate';
 
+const ZIP_MTIME = new Date('1980-01-01T00:00:00Z');
+
 function normalizeRelativePath(value) {
   return value.replaceAll('\\', '/');
 }
@@ -109,7 +111,7 @@ export function assembleFinalStage1Package({
       fs.readFileSync(path.join(packageDir, relativePath)),
     ]),
   );
-  const zipBytes = zipSync(zipEntries, { level: 0 });
+  const zipBytes = zipSync(zipEntries, { level: 0, mtime: ZIP_MTIME });
   const zipPath = path.join(outputRoot, `${addonId}-local_js.zip`);
   fs.mkdirSync(path.dirname(zipPath), { recursive: true });
   fs.writeFileSync(zipPath, zipBytes);
