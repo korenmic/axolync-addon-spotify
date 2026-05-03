@@ -1,0 +1,44 @@
+schema = "axolync.repo/v1"
+
+[repo]
+id = "axolync-addon-spotify"
+roles = ["consumable"]
+display_name = "Axolync Spotify Addon"
+description = "Stage 1 Spotify-backed SongMetadata addon."
+
+[source]
+git_url = "https://github.com/korenmic/axolync-addon-spotify.git"
+default_ref = "master"
+local_dev_path_hint = "../axolync-addon-spotify"
+
+[bootstrap]
+install_mode = "managed-clone"
+install_root = ".axolync/repos"
+readme = "README.md"
+agent_docs = ["README.md", "docs/project-seeds"]
+
+[exports.tests]
+full = "npm test"
+smoke = "npm run validate"
+
+[exports.seeds]
+roots = ["docs/project-seeds"]
+
+[exports.docs]
+bootstrap = ["README.md"]
+standards = ["docs/project-seeds"]
+
+[exports.packaging]
+command = "npm run package"
+outputs = ["artifacts/output/local_js/axolync-addon-spotify-local_js.zip"]
+
+[[exports.inventories]]
+name = "adapter-catalog"
+path = "report/addon-manifest.spotify.json"
+format = "json"
+
+[[consumes.repos]]
+id = "axolync-contract"
+use = "schema-and-runtime-contracts"
+required = true
+source = "managed"
