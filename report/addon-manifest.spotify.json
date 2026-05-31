@@ -2,7 +2,7 @@
   "addon": {
     "addon_id": "axolync-addon-spotify",
     "name": "Axolync Spotify Addon",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "contracts_version": "2.0.0",
     "description": "Stage 1 Spotify-backed SongMetadata addon for canonical duration enrichment.",
     "requirements": [],
